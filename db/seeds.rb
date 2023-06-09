@@ -32,3 +32,4 @@ end
 games.each do |game_data|
   Game.create(game_data)
 end
+
