@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_06_07_204102) do
+ActiveRecord::Schema.define(version: 2023_06_09_205557) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -31,16 +31,23 @@ ActiveRecord::Schema.define(version: 2023_06_07_204102) do
   end
 
   create_table "games", force: :cascade do |t|
-    t.string "image"
+    t.string "cover"
     t.string "name"
     t.string "platform"
-    t.string "developers"
-    t.string "publishers"
-    t.date "release_date"
-    t.integer "players"
-    t.boolean "co_op"
-    t.string "overview"
-    t.string "genre"
+    t.integer "release_date"
+    t.string "involved_company"
+    t.string "player_perspective"
+    t.integer "aggregated_rating"
+    t.integer "aggregated_rating_count"
+    t.string "summary"
+    t.bigint "genre_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["genre_id"], name: "index_games_on_genre_id"
+  end
+
+  create_table "genres", force: :cascade do |t|
+    t.string "name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -50,20 +57,13 @@ ActiveRecord::Schema.define(version: 2023_06_07_204102) do
     t.integer "age"
     t.string "avatar"
     t.string "bio"
+    t.integer "total_games_played"
+    t.string "favorite_genre"
+    t.integer "total_hours_played"
     t.bigint "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["user_id"], name: "index_profiles_on_user_id"
-  end
-
-  create_table "statistics", force: :cascade do |t|
-    t.integer "total_games_played"
-    t.string "favorite_genre"
-    t.integer "hours_played"
-    t.bigint "user_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["user_id"], name: "index_statistics_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -76,6 +76,6 @@ ActiveRecord::Schema.define(version: 2023_06_07_204102) do
 
   add_foreign_key "game_logs", "games"
   add_foreign_key "game_logs", "users"
+  add_foreign_key "games", "genres"
   add_foreign_key "profiles", "users"
-  add_foreign_key "statistics", "users"
 end
