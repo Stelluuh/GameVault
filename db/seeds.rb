@@ -1,7 +1,34 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Examples:
-#
-#   movies = Movie.create([{ name: "Star Wars" }, { name: "Lord of the Rings" }])
-#   Character.create(name: "Luke", movie: movies.first)
+require 'httparty'
+require 'json'
+
+client_id = ENV['IGDB_CLIENT_ID']
+authorization = ENV['IGDB_AUTHORIZATION']
+
+response = HTTParty.post('https://api.igdb.com/v4/games/', headers: {
+  'Client-ID' => client_id,
+  'Authorization' => "Bearer #{authorization}"
+}, body: 'fields aggregated_rating, aggregated_rating_count, cover.url, first_release_date, genres.name, involved_companies.company.name, name, platforms.name, player_perspectives.name, rating, rating_count, summary, total_rating, total_rating_count;')
+
+# Rest of the code remains the same
+
+
+games_data = JSON.parse(response.body)
+
+games = games_data.map do |game|
+  {
+    name: game['name'],
+    cover: game['cover']['url'],
+    platform: game['platforms'][0]['name'], 
+    release_date: game['first_release_date'],
+    involved_company: game['involved_companies'][0]['company']['name'], 
+    player_perspective: game['player_perspectives'][0]['name'],
+    aggregated_rating: game['aggregated_rating'],
+    aggregated_rating_count: game['aggregated_rating_count'],
+    summary: game['summary'],
+    genre: game['genres'][0]['name']
+  }
+end
+
+games.each do |game_data|
+  Game.create(game_data)
+end
