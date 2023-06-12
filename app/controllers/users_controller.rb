@@ -5,6 +5,7 @@ class UsersController < ApplicationController
         render json: @current_user
     end
 
+    #sign up
     def create
         user = User.create!(user_params)
         session[:user_id] = user.id #logs in user
